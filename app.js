@@ -23,9 +23,13 @@ if (missing.length > 0) {
   console.log('✅ All required environment variables are set');
 }
 
+// Strip accidental surrounding quotes/spaces from the env var
+const FRONTEND_ORIGIN = (process.env.FRND_END_API || '').replace(/^["'\s]+|["'\s]+$/g, '');
+console.log('🌐 CORS origin set to:', FRONTEND_ORIGIN);
+
 app.use(
   cors({
-    origin: process.env.FRND_END_API,
+    origin: FRONTEND_ORIGIN || '*',
     credentials: true,
   }),
 );
