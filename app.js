@@ -23,13 +23,21 @@ if (missing.length > 0) {
   console.log('✅ All required environment variables are set');
 }
 
-// Strip accidental surrounding quotes/spaces from the env var
-const FRONTEND_ORIGIN = (process.env.FRND_END_API || '').replace(/^["'\s]+|["'\s]+$/g, '');
+// Function-based CORS — safe against any env var formatting issues
+const FRONTEND_ORIGIN = (process.env.FRND_END_API || '').replace(/^["'\s]+|["'\s]+$/g, '').trim();
 console.log('🌐 CORS origin set to:', FRONTEND_ORIGIN);
 
 app.use(
   cors({
-    origin: FRONTEND_ORIGIN || '*',
+    origin: function (origin, callback) {
+      // Allow requests with no origin (curl, Postman, mobile apps)
+      if (!origin) return callback(null, true);
+      // Allow if it matches our frontend
+      if (!FRONTEND_ORIGIN || origin === FRONTEND_ORIGIN) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
   }),
 );
