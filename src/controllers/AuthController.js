@@ -48,7 +48,7 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     // Create reset URL
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRND_END_API}/reset-password/${resetToken}`;
 
     const message = `
       <h1>You have requested a password reset</h1>
@@ -174,17 +174,18 @@ exports.login = async (req, res) => {
     await user.save();
 
     // Set cookies
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'strict',
       maxAge: 15 * 60 * 1000 // 15 minutes
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -227,10 +228,11 @@ exports.refreshToken = async (req, res) => {
 
     const newAccessToken = generateAccessToken(user);
 
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'strict',
       maxAge: 15 * 60 * 1000
     });
 
