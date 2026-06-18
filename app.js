@@ -27,21 +27,27 @@ if (missing.length > 0) {
 const FRONTEND_ORIGIN = (process.env.FRND_END_API || '').replace(/^["'\s]+|["'\s]+$/g, '').trim();
 console.log(' CORS origin set to:', FRONTEND_ORIGIN);
 
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       // Allow requests with no origin (curl, Postman, mobile apps)
+//       if (!origin) return callback(null, true);
+//       // Allow if it matches our frontend
+//       if (!FRONTEND_ORIGIN || origin === FRONTEND_ORIGIN) {
+//         return callback(null, true);
+//       }
+//       return callback(null, false);
+//     },
+//     credentials: true,
+//   }),
+// );
+
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (curl, Postman, mobile apps)
-      if (!origin) return callback(null, true);
-      // Allow if it matches our frontend
-      if (!FRONTEND_ORIGIN || origin === FRONTEND_ORIGIN) {
-        return callback(null, true);
-      }
-      return callback(null, false);
-    },
+    origin: process.env.FRND_END_API,
     credentials: true,
-  }),
+  })
 );
-
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
